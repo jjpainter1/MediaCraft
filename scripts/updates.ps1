@@ -2,7 +2,13 @@ param(
     [switch]$FirstTimeInstall = $false
 )
 
-Write-Host "First Time Install flag: $FirstTimeInstall"
+function Write-Log {
+    param([string]$message)
+    Write-Host $message
+    Add-Content -Path "install_log.txt" -Value $message
+}
+
+Write-Log "First Time Install flag: $FirstTimeInstall"
 
 $repoUrl = "https://raw.githubusercontent.com/jjpainter1/MediaCraft/main"
 
@@ -17,33 +23,45 @@ if ($FirstTimeInstall) {
 $localVersionObj = $localVersion | ConvertFrom-Json
 $remoteVersion = Invoke-RestMethod -Uri "$repoUrl/version.json"
 
-Write-Host "Local version: $($localVersionObj.version)"
-Write-Host "Remote version: $($remoteVersion.version)"
+Write-Log "Local version: $($localVersionObj.version)"
+Write-Log "Remote version: $($remoteVersion.version)"
 
 if ($FirstTimeInstall -or ($remoteVersion.version -gt $localVersionObj.version)) {
-    Write-Host "Update available or first-time install. Downloading changes..."
+    Write-Log "Update available or first-time install. Downloading changes..."
     
     # Define root files to download
     $rootFiles = @("changelog.txt", "LICENSE", "mediacraft.bat", "README.md", "requirements.txt", "setup.py", "version.json")
     
     # Download root files
     foreach ($file in $rootFiles) {
-        Write-Host "Downloading $file"
-        Invoke-WebRequest -Uri "$repoUrl/$file" -OutFile $file
+        Write-Log "Downloading $file"
+        try {
+            Invoke-WebRequest -Uri "$repoUrl/$file" -OutFile $file -ErrorAction Stop
+        }
+        catch {
+            Write-Log "Error downloading $file $_"
+            throw
+        }
     }
     
     # Download directories and their contents
     $directories = @("src", "resources", "docs")
     foreach ($dir in $directories) {
-        Write-Host "Downloading $dir directory"
+        Write-Log "Downloading $dir directory"
         if (!(Test-Path $dir)) {
             New-Item -ItemType Directory -Force -Path $dir | Out-Null
         }
-        $files = Invoke-RestMethod -Uri "https://api.github.com/repos/jjpainter1/MediaCraft/contents/$dir"
-        foreach ($file in $files) {
-            $filePath = Join-Path $dir $file.name
-            Write-Host "Downloading $filePath"
-            Invoke-WebRequest -Uri $file.download_url -OutFile $filePath
+        try {
+            $files = Invoke-RestMethod -Uri "https://api.github.com/repos/jjpainter1/MediaCraft/contents/$dir" -ErrorAction Stop
+            foreach ($file in $files) {
+                $filePath = Join-Path $dir $file.name
+                Write-Log "Downloading $filePath"
+                Invoke-WebRequest -Uri $file.download_url -OutFile $filePath -ErrorAction Stop
+            }
+        }
+        catch {
+            Write-Log "Error downloading $dir $_"
+            throw
         }
     }
     

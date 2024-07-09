@@ -81,13 +81,23 @@ catch {
 # Change to the installation directory
 Set-Location -Path $installDir
 
-# Download version.json and updates.ps1
+# # Download version.json and updates.ps1
+# try {
+#     Invoke-WebRequest -Uri "$repoUrl/version.json" -OutFile "version.json" -ErrorAction Stop
+#     Invoke-WebRequest -Uri "$repoUrl/scripts/updates.ps1" -OutFile "updates.ps1" -ErrorAction Stop
+# }
+# catch {
+#     [System.Windows.Forms.MessageBox]::Show("Error: Unable to download necessary files. Please check your internet connection.", "Download Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+#     exit 1
+# }
+
+# Copy version.json and updates.ps1 from local paths
 try {
-    Invoke-WebRequest -Uri "$repoUrl/version.json" -OutFile "version.json" -ErrorAction Stop
-    Invoke-WebRequest -Uri "$repoUrl/scripts/updates.ps1" -OutFile "updates.ps1" -ErrorAction Stop
+    Copy-Item "C:\MediaCraft\version.json" -Destination "version.json" -ErrorAction Stop
+    Copy-Item "C:\MediaCraft\scripts\updates.ps1" -Destination "updates.ps1" -ErrorAction Stop
 }
 catch {
-    [System.Windows.Forms.MessageBox]::Show("Error: Unable to download necessary files. Please check your internet connection.", "Download Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    [System.Windows.Forms.MessageBox]::Show("Error: Unable to copy necessary files. Please check your file paths.", "Copy Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
     exit 1
 }
 
@@ -101,7 +111,12 @@ try {
     }
 }
 catch {
-    [System.Windows.Forms.MessageBox]::Show("Error: Unable to run the update script. Installation may be incomplete.", "Update Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+    $errorMessage = $_.Exception.Message
+    $errorLine = $_.InvocationInfo.ScriptLineNumber
+    $errorScript = $_.InvocationInfo.ScriptName
+    $detailedError = "Error in script $errorScript at line $errorLine $errorMessage"
+    Write-Host $detailedError
+    [System.Windows.Forms.MessageBox]::Show("Error: Unable to run the update script. Installation may be incomplete.`n`nDetailed error: $detailedError", "Update Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
     exit 1
 }
 
