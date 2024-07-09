@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2024 jjpainter1
+Copyright (c) 2024 JJ Painter
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Third-Party Software:
+
+1. OpenImageIO:
+   This project includes OpenImageIO version 2.6.2.0dev, which is licensed under the Apache-2.0 license. 
+   The full text of the Apache-2.0 license can be found at https://www.apache.org/licenses/LICENSE-2.0.txt
+
+   OpenImageIO is (c) Copyright Contributors to the OpenImageIO project.
+   For more information about OpenImageIO, visit https://openimageio.org
+
+2. FFmpeg:
+   This project uses FFmpeg, which is licensed under the GNU Lesser General Public License (LGPL) version 2.1 or later.
+   The full text of the LGPLv2.1 can be found at https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+   FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project.
+   For more information about FFmpeg, visit https://ffmpeg.org
+
+   Note: Depending on how FFmpeg is configured, it may include components under the GNU General Public License (GPL).
+   If GPL components are included, this software must comply with the terms of the GPL.
