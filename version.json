@@ -1,0 +1,15 @@
+{
+    "version": "0.1.1",
+    "components": {
+      "src/core": "0.1.1",
+      "src/modules/ffmpeg": "0.1.1",
+      "src/modules/openimageio": "0.1.1",
+      "src/modules/dailies": "0.1.1",
+      "src/gui": "0.1.1",
+      "resources/config/default_config.yaml": "0.1.1",
+      "third_party": {
+        "ffmpeg": "7.0.1",
+        "openimageio": "2.6.2.0dev"
+      }
+    }
+  }
