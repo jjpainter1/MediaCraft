@@ -8,9 +8,44 @@ function Write-Log {
     Add-Content -Path "install_log.txt" -Value $message
 }
 
+function Download-Directory {
+    param (
+        [string]$path,
+        [string]$localPath
+    )
+    
+    Write-Log "Attempting to download directory: $path"
+    if (!(Test-Path $localPath)) {
+        New-Item -ItemType Directory -Force -Path $localPath | Out-Null
+    }
+    
+    try {
+        $files = Invoke-RestMethod -Uri "$apiUrl/$path" -Headers @{"Accept" = "application/vnd.github.v3+json"} -ErrorAction Stop
+        foreach ($file in $files) {
+            $filePath = Join-Path $localPath $file.name
+            if ($file.type -eq "dir") {
+                Download-Directory -path "$path/$($file.name)" -localPath $filePath
+            } else {
+                Write-Log "Downloading $filePath"
+                Invoke-WebRequest -Uri $file.download_url -OutFile $filePath -ErrorAction Stop
+            }
+        }
+    }
+    catch {
+        if ($_.Exception.Response.StatusCode -eq 404) {
+            Write-Log "Directory $path not found. Skipping."
+        }
+        else {
+            Write-Log "Error downloading $path $_"
+            throw
+        }
+    }
+}
+
 Write-Log "First Time Install flag: $FirstTimeInstall"
 
 $repoUrl = "https://raw.githubusercontent.com/jjpainter1/MediaCraft/main"
+$apiUrl = "https://api.github.com/repos/jjpainter1/MediaCraft/contents"
 
 # Create a temporary version file for first-time installs
 if ($FirstTimeInstall) {
@@ -47,46 +82,7 @@ if ($FirstTimeInstall -or ($remoteVersion.version -gt $localVersionObj.version))
     # Download directories and their contents
     $directories = @("src", "resources", "docs")
     foreach ($dir in $directories) {
-        Write-Log "Downloading $dir directory"
-        if (!(Test-Path $dir)) {
-            New-Item -ItemType Directory -Force -Path $dir | Out-Null
-        }
-        try {
-            $files = Invoke-RestMethod -Uri "https://api.github.com/repos/jjpainter1/MediaCraft/contents/$dir" -ErrorAction Stop
-            foreach ($file in $files) {
-                $filePath = Join-Path $dir $file.name
-                Write-Log "Downloading $filePath"
-                Invoke-WebRequest -Uri $file.download_url -OutFile $filePath -ErrorAction Stop
-            }
-        }
-        catch {
-            Write-Log "Error downloading $dir $_"
-            throw
-        }
-    }
-    
-    foreach ($component in $remoteVersion.components.PSObject.Properties) {
-        $componentPath = $component.Name
-        $newVersion = $component.Value
-        
-        Write-Host "Checking component: $componentPath"
-        if ($FirstTimeInstall -or ($newVersion -gt $localVersionObj.components.$componentPath)) {
-            Write-Host "Updating $componentPath to version $newVersion"
-            
-            # If it's a directory, download all files in that directory
-            if (Test-Path $componentPath -PathType Container) {
-                $files = Invoke-RestMethod -Uri "https://api.github.com/repos/jjpainter1/MediaCraft/contents/$componentPath"
-                foreach ($file in $files) {
-                    $filePath = Join-Path $componentPath $file.name
-                    Write-Host "Downloading $filePath"
-                    Invoke-WebRequest -Uri $file.download_url -OutFile $filePath
-                }
-            } else {
-                # If it's a file, just download that file
-                Write-Host "Downloading file $componentPath"
-                Invoke-WebRequest -Uri "$repoUrl/$componentPath" -OutFile $componentPath
-            }
-        }
+        Download-Directory -path $dir -localPath $dir
     }
     
     # Update local version file
@@ -96,15 +92,15 @@ if ($FirstTimeInstall -or ($remoteVersion.version -gt $localVersionObj.version))
     $changelog = Invoke-RestMethod -Uri "$repoUrl/changelog.txt"
     $latestChanges = $changelog -split "`nVersion" | Select-Object -First 1
     
-    Write-Host "Update completed successfully."
-    Write-Host "Latest changes:"
-    Write-Host $latestChanges
+    Write-Log "Update completed successfully."
+    Write-Log "Latest changes:"
+    Write-Log $latestChanges
     
     # Update local changelog file
     $changelog | Set-Content -Path "changelog.txt"
     
 } else {
-    Write-Host "Your MediaCraft is up to date."
+    Write-Log "Your MediaCraft is up to date."
 }
 
 # Clean up temporary version file if it exists

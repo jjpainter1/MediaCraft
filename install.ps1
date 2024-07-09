@@ -101,6 +101,49 @@ catch {
     exit 1
 }
 
+# Function to prompt for third-party application path
+function Get-ThirdPartyPath($appName, $defaultPath) {
+    $useOwn = [System.Windows.Forms.MessageBox]::Show(
+        "Do you want to use your own installation of $appName?",
+        "Third-Party Dependency",
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Question
+    )
+    
+    if ($useOwn -eq 'Yes') {
+        $folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
+        $folderBrowser.Description = "Select the installation folder for $appName"
+        $folderBrowser.SelectedPath = $defaultPath
+        
+        if ($folderBrowser.ShowDialog() -eq "OK") {
+            return $folderBrowser.SelectedPath
+        } else {
+            [System.Windows.Forms.MessageBox]::Show("No folder selected for $appName. Will use default installation.", "Using Default", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+            return $null
+        }
+    } else {
+        return $null
+    }
+}
+
+# Prompt for third-party applications
+$ffmpegPath = Get-ThirdPartyPath "FFmpeg-7.0.1" "C:\Program Files\FFmpeg"
+$openImageIOPath = Get-ThirdPartyPath "OpenImageIO-2.6.2" "C:\Program Files\OpenImageIO"
+$pythonPath = Get-ThirdPartyPath "Python 3.12.4" "C:\Program Files\Python312"
+
+# Create a hashtable to store the paths
+$thirdPartyPaths = @{
+    "ffmpeg" = $ffmpegPath
+    "openimageio" = $openImageIOPath
+    "python" = $pythonPath
+}
+
+# Convert the hashtable to JSON and save it
+$thirdPartyPaths | ConvertTo-Json | Set-Content -Path (Join-Path $installDir "third_party_paths.json")
+
+
+
+
 # Run the update script with the first-time install flag
 try {
     Write-Host "Running updates.ps1 with FirstTimeInstall: $isFirstTimeInstall"
