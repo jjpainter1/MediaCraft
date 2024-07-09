@@ -1,6 +1,9 @@
 {
     "version": "0.1.1",
     "components": {
+      "src": "0.1.1",
+      "resources": "0.1.1",
+      "docs": "0.1.1",
       "src/core": "0.1.1",
       "src/modules/ffmpeg": "0.1.1",
       "src/modules/openimageio": "0.1.1",
@@ -10,6 +13,12 @@
       "third_party": {
         "ffmpeg": "7.0.1",
         "openimageio": "2.6.2.0dev"
-      }
+      },
+      "changelog.txt": "0.1.1",
+      "LICENSE": "0.1.1",
+      "mediacraft.bat": "0.1.1",
+      "README.md": "0.1.1",
+      "requirements.txt": "0.1.1",
+      "setup.py": "0.1.1"
     }
-  }
+}
