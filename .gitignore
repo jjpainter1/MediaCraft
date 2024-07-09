@@ -28,7 +28,7 @@ Thumbs.db
 
 # Project-specific
 tests/
-third_party/
+# third_party/
 *.log
 
 # Ignore all files in the root tests directory
