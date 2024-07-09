@@ -2,6 +2,11 @@ Install Command
 iwr -useb https://raw.githubusercontent.com/jjpainter1/MediaCraft/main/install.ps1 | iex
 
 
+Pushing Updates to GitHub
+
+git add . (adds all new files and changes)
+git commit -m "Update MediaCraft" (commits the changes)
+git push origin main (pushes the changes to the remote repository)
 
 
 

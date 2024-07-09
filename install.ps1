@@ -1,3 +1,6 @@
+# Bypass execution policy for this session
+Set-ExecutionPolicy Bypass -Scope Process -Force
+
 $repoUrl = "https://raw.githubusercontent.com/jjpainter1/MediaCraft/main"
 
 # Create MediaCraft directory if it doesn't exist
