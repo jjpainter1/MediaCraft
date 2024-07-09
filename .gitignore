@@ -1,0 +1,38 @@
+# Python-related
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.egg-info/
+.eggs/
+.pytest_cache/
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS-related
+.DS_Store
+Thumbs.db
+
+# Project-specific
+tests/
+third_party/
+*.log
+
+# Ignore all files in the root tests directory
+/tests/*
+# But don't ignore .gitkeep files in subdirectories of tests
+!/tests/**/
+!/tests/**/.gitkeep
